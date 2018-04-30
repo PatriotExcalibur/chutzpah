@@ -9546,12 +9546,12 @@ namespace Chutzpah.VSTS {
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://microsoft.com/schemas/VisualStudio/TeamTest/2010")]
     public partial class OutputTypeErrorInfo {
         
-        private object messageField;
+        private string messageField;
         
         private object stackTraceField;
         
         /// <remarks/>
-        public object Message {
+        public string Message {
             get {
                 return this.messageField;
             }
