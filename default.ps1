@@ -29,7 +29,7 @@ task Default -depends Build
 
 task Install -depends Sign-ForeignAssemblies, Install-TypeScript, Install-NodeModules, Setup-SymbolicLinks
 
-task Package -depends Clean-Solution-VS,Clean-PackageFiles, Set-Version, Update-VersionInFiles, Build-Solution-VS, Package-Files, Package-NuGet, Package-Chocolatey
+task Package -depends Clean-Solution-VS,Clean-PackageFiles, Set-Version, Update-VersionInFiles, Build-Solution-VS, Package-Files, Package-NuGet
 task Clean -depends Clean-Solution-NoVS
 task TeamCity -depends  Clean-TeamCitySolution, Build-TeamCitySolution, Run-UnitTests, Run-IntegrationTests
 
