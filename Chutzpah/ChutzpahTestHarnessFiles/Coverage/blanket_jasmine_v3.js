@@ -5785,7 +5785,7 @@ blanket.defaultReporter = function (coverage) {
     	    /// ### Use Chutzpah function in jasmine boot to handle running
 	    //  ### to encapsulate any extra safeguards we need
    	    /// ### CHUTZPAH EDIT ###
-            window.blaninitializeJasmine();
+            window.initializeJasmine();
         }
     });
 })();

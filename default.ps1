@@ -48,7 +48,7 @@ task Set-Version {
   
   if($arg1) {
     $v = $arg1
-    $global:version = $v + ".0"
+    $global:version = $v + ""
     
     if($arg2) {
       $global:isBeta = $true

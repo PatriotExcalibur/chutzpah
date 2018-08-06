@@ -385,6 +385,9 @@
     <Content Include="ChutzpahJSRunners\Chrome\jasmineRunnerV1.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="ChutzpahJSRunners\Chrome\jasmineRunnerV3.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ChutzpahJSRunners\Chrome\jasmineRunnerV2.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -397,6 +400,9 @@
     <Content Include="ChutzpahJSRunners\Chrome\setupRunner.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="ChutzpahJSRunners\jasmineFunctionsV3.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ChutzpahJSRunners\jasmineFunctionsV2.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -404,6 +410,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ChutzpahJSRunners\JsDom\jasmineRunnerV1.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ChutzpahJSRunners\JsDom\jasmineRunnerV3.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ChutzpahJSRunners\JsDom\jasmineRunnerV2.js">
@@ -424,6 +433,9 @@
     <Content Include="ChutzpahJSRunners\Phantom\jasmineRunnerV1.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="ChutzpahJSRunners\Phantom\jasmineRunnerV3.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ChutzpahJSRunners\Phantom\jasmineRunnerV2.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -434,6 +446,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ChutzpahTestHarnessFiles\chutzpah_boot.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ChutzpahTestHarnessFiles\Coverage\blanket_jasmine_v3.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="ChutzpahTestHarnessFiles\Coverage\blanket_jasmine_v2.js">
@@ -483,6 +498,24 @@
     </Content>
     <Content Include="ChutzpahTestHarnessFiles\Jasmine\v2\jasmine_favicon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ChutzpahTestHarnessFiles\Jasmine\v3\boot.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ChutzpahTestHarnessFiles\Jasmine\v3\jasmine-html.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ChutzpahTestHarnessFiles\Jasmine\v3\jasmine.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ChutzpahTestHarnessFiles\Jasmine\v3\jasmine.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ChutzpahTestHarnessFiles\Jasmine\v3\jasmine.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ChutzpahTestHarnessFiles\Jasmine\v3\jasmine_favicon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ChutzpahTestHarnessFiles\Mocha\mocha.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
