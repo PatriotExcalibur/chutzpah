@@ -87,6 +87,14 @@ namespace Chutzpah
             return !string.IsNullOrEmpty(fileName) && fileName.StartsWith(Constants.ChutzpahTemporaryFilePrefix, StringComparison.OrdinalIgnoreCase);
         }
 
+        public bool IsNodeModule(string rootPath, string path)
+        {
+            if (string.IsNullOrEmpty(path)) return false;
+
+
+            return path.Contains(Path.Combine(rootPath, "node_modules"));
+        }
+
 
         public bool IsChutzpahSettingsFile(string path)
         {
@@ -113,7 +121,7 @@ namespace Chutzpah
                 switch (pathInfo.Type)
                 {
                     case PathType.Url:
-                            yield return pathInfo;
+                        yield return pathInfo;
                         break;
                     case PathType.Html:
                     case PathType.JavaScript:
@@ -121,7 +129,7 @@ namespace Chutzpah
                         break;
                     case PathType.Folder:
                         var query = from file in fileSystem.GetFiles(pathInfo.FullPath, "*.*", SearchOption.AllDirectories)
-                                    where file.Length < 260 && !IsTemporaryChutzpahFile(file)
+                                    where file.Length < 260 && !IsTemporaryChutzpahFile(file) && !IsNodeModule(path, file)
                                     let info = GetPathInfo(file)
                                     where info.Type != PathType.Other
                                     select info;
@@ -218,7 +226,7 @@ namespace Chutzpah
         {
             get
             {
-                if(builtInDependencyDirectory == null)
+                if (builtInDependencyDirectory == null)
                 {
                     builtInDependencyDirectory = FindFolderPath(Constants.TestFileFolder);
                 }
@@ -265,7 +273,7 @@ namespace Chutzpah
 
         private string GetReferenceFileContentAndSetHash(ReferencedFile file, ChutzpahTestSettingsFile settings)
         {
-            if(!file.IsLocal)
+            if (!file.IsLocal)
             {
                 return null;
             }
