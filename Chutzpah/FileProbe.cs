@@ -91,6 +91,10 @@ namespace Chutzpah
         {
             if (string.IsNullOrEmpty(path)) return false;
 
+            if (rootPath == ".")
+            {
+                return path.Contains("node_modules");
+            }
 
             return path.Contains(Path.Combine(rootPath, "node_modules"));
         }
