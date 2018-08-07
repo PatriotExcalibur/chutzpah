@@ -242,7 +242,7 @@ task Package-NuGet -depends Clean-PackageFiles, Set-Version {
     $v = new-object -TypeName System.Version -ArgumentList $global:version
     
     
-    $vStr = $v.ToString(3)
+    $vStr = $v.ToString(4)
     if($global:isBeta) {
       $vStr += "-beta"
     }
