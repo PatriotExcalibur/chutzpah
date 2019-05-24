@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
-using Chutzpah.Extensions;
+﻿using Chutzpah.Extensions;
 using Chutzpah.Models;
 using Chutzpah.VSTS;
 using Chutzpah.Wrappers;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml.Serialization;
 
 namespace Chutzpah.Transformers
 {
@@ -172,7 +169,7 @@ namespace Chutzpah.Transformers
                     testId = testCase.Id.ToString(),
                     testName = testCase.TestName,
                     computerName = Environment.MachineName,
-                    duration = new TimeSpan(0, 0, testCase.TimeTaken).ToString("c"),
+                    duration = TimeSpan.FromMilliseconds(testCase.TimeTaken).ToString("c"),
                     // I tried adding this to StandardConsoleRunner, but it demanded too many changes.
                     // Setting start to the creation date.
                     startTime = DateTime.Now.AddMilliseconds(-testFileSummary.TimeTaken).ToString("O"),
@@ -180,7 +177,7 @@ namespace Chutzpah.Transformers
                     endTime = DateTime.Now.AddMilliseconds((-testFileSummary.TimeTaken) + testCase.TimeTaken).ToString("O"),
                     // This is for specific test type.
                     testType = "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
-                    outcome = testCase.TestOutcome == Models.TestOutcome.Passed ? "Passed" : 
+                    outcome = testCase.TestOutcome == Models.TestOutcome.Passed ? "Passed" :
                                                       testCase.TestOutcome == Models.TestOutcome.Skipped ? "NotExecuted" : "Failed",
                     testListId = testList.id,
 
