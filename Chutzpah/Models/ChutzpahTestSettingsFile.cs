@@ -52,11 +52,21 @@ namespace Chutzpah.Models
 
     public class EngineOptions
     {
-        public bool PreventDownloadOfEngineDepenedencies { get; set; }
+        /// <summary>
+        /// The path to the chrome/chromium executable on the machine
+        /// </summary>
+        public string ChromeBrowserPath { get; set; }
+
+        /// <summary>
+        /// Whether or not to execute node with remote debugging enabled.
+        /// </summary>
+        public bool NodeInspect { get; set; }
     }
 
     public class ForcedChutzpahWebServerConfiguration : ChutzpahWebServerConfiguration
     {
+        public static readonly ForcedChutzpahWebServerConfiguration Instance = new ForcedChutzpahWebServerConfiguration();
+
         public ForcedChutzpahWebServerConfiguration()
         {
             Enabled = true;
@@ -104,7 +114,7 @@ namespace Chutzpah.Models
             
             if (ForceWebServerMode)
             {
-                Server = new ForcedChutzpahWebServerConfiguration();
+                Server = ForcedChutzpahWebServerConfiguration.Instance;
             }
         }
 
@@ -254,9 +264,15 @@ namespace Chutzpah.Models
         /// </summary>
         public int? CodeCoverageTimeout { get; set; }
 
+        /// <summary>
+        /// The browser engine to use to run the tests. Default is Phantom but JSDOM and Chrome are available. 
+        /// If you choose Chrome you must have an instance of Chrome or Chromium on the machine that Chutzpah can find.
+        /// </summary>
         public Engine? Engine { get; set; }
 
-
+        /// <summary>
+        /// The options for configuring the chosen engine
+        /// </summary>        
         public EngineOptions EngineOptions { get; set; }
 
         /// <summary>

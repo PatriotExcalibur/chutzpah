@@ -132,6 +132,8 @@ namespace Chutzpah
 
                     ProcessTraceFilePath(settings, chutzpahVariables);
 
+                    ProcessEngine(settings, chutzpahVariables);
+
                     ProcessServerSettings(settings, chutzpahVariables);
 
                     ProcessProxy(settings, chutzpahVariables);
@@ -161,15 +163,15 @@ namespace Chutzpah
             {
                 if (settings.Server == null)
                 {
-                    settings.Server = new ForcedChutzpahWebServerConfiguration();
+                    settings.Server = ForcedChutzpahWebServerConfiguration.Instance;
                 }
-                else
+                else if (!settings.Server.Enabled.HasValue)
                 {
                     settings.Server.Enabled = true;
                 }
             }
 
-            if (settings.Server != null)
+            if (settings.Server != null && settings.Server.Enabled.GetValueOrDefault())
             {
                 settings.Server.FileCachingEnabled = settings.Server.FileCachingEnabled ?? true;
 
@@ -323,6 +325,16 @@ namespace Chutzpah
                 }
             }
 
+        }
+
+
+        private void ProcessEngine(ChutzpahTestSettingsFile settings, IDictionary<string, string> chutzpahVariables)
+        {
+            if (settings.EngineOptions != null && !string.IsNullOrWhiteSpace(settings.EngineOptions.ChromeBrowserPath))
+            {
+                settings.EngineOptions.ChromeBrowserPath = ResolveFilePath(settings, ExpandVariable(chutzpahVariables, settings.EngineOptions.ChromeBrowserPath));
+
+            }
         }
 
         private void ProcessPathSettings(ChutzpahTestSettingsFile settings, IDictionary<string, string> chutzpahVariables)

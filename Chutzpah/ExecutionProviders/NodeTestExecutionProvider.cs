@@ -40,22 +40,6 @@ namespace Chutzpah
 
         public void SetupEnvironment(TestOptions testOptions, TestContext testContext)
         {
-            if (testContext.TestFileSettings.Engine != Engine.Chrome || 
-                (testContext.TestFileSettings.EngineOptions != null && testContext.TestFileSettings.EngineOptions.PreventDownloadOfEngineDepenedencies))
-            {
-                return;
-            }
-
-            
-            string runnerPath = Directory.GetParent(fileProbe.FindFilePath(testContext.TestRunner)) + @"\setupRunner.js";
-            var environmentVariables = BuildEnvironmentVariables();
-            var processResult = processTools.RunExecutableAndProcessOutput(headlessBrowserPath, runnerPath, environmentVariables, out string standardOutput, out string standardError);
-
-            if (!processResult)
-            {
-                throw new ChutzpahException($"Unable to install Chromium: Output: {standardOutput},   Error: {standardError}");
-            }
-
         }
 
         public IList<TestFileSummary> Execute(TestOptions testOptions,
@@ -66,8 +50,8 @@ namespace Chutzpah
 
             string runnerPath = fileProbe.FindFilePath(testContext.TestRunner);
             string fileUrl = BuildHarnessUrl(testContext);
-            bool preventDownloadOfEngineDepenedencies = testContext.TestFileSettings.EngineOptions != null && testContext.TestFileSettings.EngineOptions.PreventDownloadOfEngineDepenedencies;
-            string runnerArgs = BuildRunnerArgs(testOptions, testContext, fileUrl, runnerPath, testExecutionMode, isRunningElevated, preventDownloadOfEngineDepenedencies);
+            string chromeBrowserPath = testContext.TestFileSettings?.EngineOptions?.ChromeBrowserPath;
+            string runnerArgs = BuildRunnerArgs(testOptions, testContext, fileUrl, runnerPath, testExecutionMode, isRunningElevated, chromeBrowserPath);
 
             var streamTimeout = ((testContext.TestFileSettings.TestFileTimeout ?? testOptions.TestFileTimeoutMilliseconds) + 500).GetValueOrDefault(); // Add buffer to timeout to account for serialization
 
@@ -76,7 +60,7 @@ namespace Chutzpah
             var environmentVariables = BuildEnvironmentVariables();
             var processResult = processTools.RunExecutableAndProcessOutput(headlessBrowserPath, runnerArgs, streamProcessor, streamTimeout, environmentVariables);
 
-            HandleTestProcessExitCode(processResult.ExitCode, testContext.FirstInputTestFile, processResult.Model.TestFileSummaries.Select(x => x.Errors).FirstOrDefault(), callback);
+            HandleTestProcessExitCode(testContext, processResult.ExitCode, testContext.FirstInputTestFile, processResult.Model.TestFileSummaries.Select(x => x.Errors).FirstOrDefault(), callback);
 
             return processResult.Model.TestFileSummaries;
         }
@@ -91,7 +75,7 @@ namespace Chutzpah
         }
 
 
-        private static void HandleTestProcessExitCode(int exitCode, string inputTestFile, IList<TestError> errors, ITestMethodRunnerCallback callback)
+        private static void HandleTestProcessExitCode(TestContext context, int exitCode, string inputTestFile, IList<TestError> errors, ITestMethodRunnerCallback callback)
         {
             string errorMessage = null;
 
@@ -118,25 +102,39 @@ namespace Chutzpah
 
                 errors.Add(error);
 
-                callback.FileError(error);
+                callback.FileError(context, error);
                 ChutzpahTracer.TraceError("Headless browser returned with an error: {0}", errorMessage);
             }
         }
 
-        private static string BuildRunnerArgs(TestOptions options, TestContext context, string fileUrl, string runnerPath, TestExecutionMode testExecutionMode, bool isRunningElevated, bool tryToFindChrome)
+        private static string BuildRunnerArgs(TestOptions options, TestContext context, string fileUrl, string runnerPath, TestExecutionMode testExecutionMode, bool isRunningElevated, string chromeBrowserPath)
         {
             string runnerArgs;
             var testModeStr = testExecutionMode.ToString().ToLowerInvariant();
             var timeout = context.TestFileSettings.TestFileTimeout ?? options.TestFileTimeoutMilliseconds ?? Constants.DefaultTestFileTimeout;
-            runnerArgs = string.Format("{0} {1} {2} {3} {4} {5} {6}",
+            string inspectBrkArg = context.TestFileSettings.EngineOptions != null && context.TestFileSettings.EngineOptions.NodeInspect ? "--inspect-brk" : "";
+
+            var engineBrowserOptions = string.Empty;
+            if (context.TestFileSettings.BrowserArguments != null && options.Engine != null)
+            {
+                var matchingEntries = context.TestFileSettings.BrowserArguments.Where(x => x.Key.Equals(options.Engine.ToString(), StringComparison.OrdinalIgnoreCase));
+                if (matchingEntries.Any())
+                {
+                    engineBrowserOptions = matchingEntries.First().Value;
+                }
+            }
+
+            runnerArgs = string.Format("{0} \"{1}\" {2} {3} {4} {5} {6} {7} \"{8}\" \"{9}\"",
+                                        inspectBrkArg,
                                         runnerPath,
                                         fileUrl,
                                         testModeStr,
                                         timeout,
                                         isRunningElevated,
                                         context.TestFileSettings.IgnoreResourceLoadingErrors.Value,
+                                        $"\"{chromeBrowserPath}\"",
                                         context.TestFileSettings.UserAgent,
-                                        tryToFindChrome);
+                                        engineBrowserOptions);
 
             return runnerArgs;
         }

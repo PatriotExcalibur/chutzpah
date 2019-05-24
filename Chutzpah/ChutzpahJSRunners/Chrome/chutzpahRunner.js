@@ -16,9 +16,10 @@ module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, o
         ignoreResourceLoadingError = false,
         finalResult = 0,
         isRunningElevated = false,
-        tryToFindChrome = false;
+        chromePath = null,
+        browserArgs = null;
 
-    startTime = new Date().getTime();;
+    startTime = new Date().getTime();
 
     testFile = process.argv[2];
     testMode = process.argv[3] || "execution";
@@ -33,11 +34,15 @@ module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, o
     }
 
     if (process.argv.length > 7) {
-        userAgent = process.argv[7];
+        chromePath = process.argv[7];
     }
 
     if (process.argv.length > 8) {
-        tryToFindChrome = "true" === process.argv[8].toLowerCase();
+        userAgent = process.argv[8];
+    }
+
+    if (process.argv.length > 9) {
+        browserArgs = process.argv[9];
     }
 
     function debugLog(msg) {
@@ -161,10 +166,10 @@ module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, o
             json;
           }
         }
-      `.trim()
+      `.trim();
     }
 
-    const puppeteer = require('puppeteer');
+    const puppeteer = require('puppeteer-core');
     const fs = require('fs');
     const path = require('path');
 
@@ -228,30 +233,35 @@ module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, o
     // Capture all uncaught exceptions and wrap before logging
     process.on('uncaughtException', handleError);
 
-
-
-
     try {
         let chromeExecutable = null;
 
-        if (tryToFindChrome) {
+        if (!chromePath) {
             const chromePaths = getChromePaths();
             if (chromePaths.length <= 0) {
                 debugLog("Could not find chrome paths");
             }
             chromeExecutable = chromePaths[0];
-            chutzpahFunctions.rawLog("!!_!! Using Chrome Install : " + chromeExecutable);
         }
         else {
-            chutzpahFunctions.rawLog("!!_!! Using Chromium...");
+            chromeExecutable = chromePath;
         }
 
-        debugLog("Launch Chrome: Elevated= " + isRunningElevated);
+        chutzpahFunctions.rawLog("!!_!! Using Chrome Install : " + chromeExecutable);
+        debugLog("Launch Chrome (" + chromeExecutable + "): Elevated= " + isRunningElevated);
+
+        // If isRunningElevated, we need to turn off sandbox since it does not work with admin users
+        var launchBrowserArges = isRunningElevated ? ["--no-sandbox"] : [];
+        if (browserArgs) {
+            launchBrowserArges.push(...browserArgs.trim().split(" "));
+        }
+        chutzpahFunctions.rawLog("!!_!! puppeteer browser args: " + JSON.stringify(launchBrowserArges));
 
         // If isRunningElevated, we need to turn off sandbox since it does not work with admin users
         const browser = await puppeteer.launch({
-            headless: true, args: isRunningElevated ? ["--no-sandbox"] : [], executablePath: chromeExecutable
-        });
+                headless: true, args: launchBrowserArges, executablePath: chromeExecutable
+            });
+
         const page = await browser.newPage();
 
         try {
@@ -259,7 +269,6 @@ module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, o
         } catch (error) {
             // Older chromes won't support this so just ignore...
         }
-
 
         if (userAgent) {
             page.setUserAgent(userAgent);
@@ -300,7 +309,7 @@ module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, o
 
         await page.evaluateOnNewDocument(getPageInitializationScript());
 
-        debugLog("### Navigate...");
+        debugLog("### Navigate..." + testFile);
         await page.goto(testFile, { waitUntil: "load" });
 
         debugLog("### loadEventFired");

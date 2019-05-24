@@ -1,22 +1,28 @@
 # ![](https://raw.githubusercontent.com/mmanela/chutzpah/master/doc/images/chetTimesSmall.png) Chutzpah - A JavaScript Test Runner
 Pronunciation: [hutz·pah](http://www.thefreedictionary.com/chutzpah)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/n8oxcg49ehp3w83o/branch/master?svg=true)](https://ci.appveyor.com/project/mmanela/chutzpah/branch/master) [![Chutzpah NuGet version](https://img.shields.io/nuget/v/Chutzpah.svg)](https://www.nuget.org/packages/Chutzpah/)
+[![Build Status](https://mmanela.visualstudio.com/Chutzpah/_apis/build/status/ChutzpahBuild)](https://mmanela.visualstudio.com/Chutzpah/_build/latest?definitionId=1)
+[![Chutzpah NuGet version](https://img.shields.io/nuget/v/Chutzpah.svg)](https://www.nuget.org/packages/Chutzpah/)
 
 Chutzpah is an open source JavaScript test runner which enables you to run unit tests using QUnit, Jasmine, Mocha, CoffeeScript and TypeScript.
 
 _For comments, praise, complaints you can reach me on twitter at [@mmanela](http://twitter.com/mmanela)_.
 
-Chutzpah supports the [QUnit](http://docs.jquery.com/QUnit), [Jasmine](http://pivotal.github.com/jasmine/) and [Mocha](http://mochajs.org/) testing frameworks. 
+Chutzpah supports the [QUnit](http://docs.jquery.com/QUnit), [Jasmine](https://jasmine.github.io/) and [Mocha](http://mochajs.org/) testing frameworks. 
 Chutzpah uses the [PhantomJS](http://www.phantomjs.org/) headless browser to run your tests.
 
 
 ## Get Chutzpah
 
 * Command Line Runner [nuget](https://www.nuget.org/packages/Chutzpah) or [chocolatey](http://chocolatey.org/packages/chutzpah)
-* [Visual Studio Test Adapter for Visual Studio 2012 or newer](http://visualstudiogallery.msdn.microsoft.com/f8741f04-bae4-4900-81c7-7c9bfb9ed1fe)
-* [Visual Studio Test Runner for 2010 or newer](http://visualstudiogallery.msdn.microsoft.com/71a4e9bd-f660-448f-bd92-f5a65d39b7f0)
+* [Visual Studio Test Adapter for Visual Studio 2015+](http://visualstudiogallery.msdn.microsoft.com/f8741f04-bae4-4900-81c7-7c9bfb9ed1fe)
+* [Visual Studio Test Runner for 2015+](http://visualstudiogallery.msdn.microsoft.com/71a4e9bd-f660-448f-bd92-f5a65d39b7f0)
 
+
+## Test Framework Versions
+- Qunit 2.6.2
+- Jasmine 2.9
+- Mocha 3.2.0
 
 ## Recent News
 

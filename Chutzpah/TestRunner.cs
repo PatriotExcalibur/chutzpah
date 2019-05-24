@@ -170,15 +170,16 @@ namespace Chutzpah
         }
 
         public TestCaseSummary RunTests(IEnumerable<string> testPaths,
-                                          TestOptions options,
-                                          ITestMethodRunnerCallback callback = null)
+                                        TestOptions options,
+                                        ITestMethodRunnerCallback callback = null,
+                                        TestContext testContext = null)
         {
             callback = options.TestLaunchMode == TestLaunchMode.FullBrowser || callback == null ? RunnerCallback.Empty : callback;
-            callback.TestSuiteStarted();
+            callback.TestSuiteStarted(testContext);
 
             var testCaseSummary = ProcessTestPaths(testPaths, options, TestExecutionMode.Execution, callback);
 
-            callback.TestSuiteFinished(testCaseSummary);
+            callback.TestSuiteFinished(testContext, testCaseSummary);
             return testCaseSummary;
         }
 
@@ -240,7 +241,7 @@ namespace Chutzpah
                 }
 
                 // Find the first test context with a web server configuration and use it
-                var webServerHost = SetupWebServerHost(testContexts, activeWebServerHost);
+                var webServerHost = SetupWebServerHost(testContexts, options);
                 ActiveWebServerHost = webServerHost;
 
                 // Build test harness for each context and execute it in parallel
@@ -282,18 +283,42 @@ namespace Chutzpah
             }
         }
 
-        private IChutzpahWebServerHost SetupWebServerHost(ConcurrentBag<TestContext> testContexts, IChutzpahWebServerHost activeWebServerHost)
+        private IChutzpahWebServerHost SetupWebServerHost(ConcurrentBag<TestContext> testContexts, TestOptions options)
         {
+            var needsServer = options.Engine.GetValueOrDefault() != Engine.Phantom;
+
             IChutzpahWebServerHost webServerHost = null;
-            var contextUsingWebServer = testContexts.Where(x => x.TestFileSettings.Server != null && x.TestFileSettings.Server.Enabled.GetValueOrDefault()).ToList();
-            var contextWithChosenServerConfiguration = contextUsingWebServer.FirstOrDefault();
+            var contextWithServerSetting = testContexts.Where(x => x.TestFileSettings.Server != null && x.TestFileSettings.Server.Enabled.HasValue).ToList();
+            var contextWithChosenServerConfiguration = contextWithServerSetting.FirstOrDefault();
+
+            if (contextWithChosenServerConfiguration == null && needsServer)
+            {
+                foreach (var testContext in testContexts)
+                {
+                    testContext.TestFileSettings.Server = ForcedChutzpahWebServerConfiguration.Instance;
+                }
+
+                contextWithServerSetting = testContexts.ToList();
+                contextWithChosenServerConfiguration = testContexts.FirstOrDefault();
+            }
+
             if (contextWithChosenServerConfiguration != null)
             {
                 var webServerConfiguration = contextWithChosenServerConfiguration.TestFileSettings.Server;
-                webServerHost = webServerFactory.CreateServer(webServerConfiguration, ActiveWebServerHost);
 
-                // Stash host object on context for use in url generation
-                contextUsingWebServer.ForEach(x => x.WebServerHost = webServerHost);
+                if (webServerConfiguration.Enabled.GetValueOrDefault())
+                {
+                    webServerHost = webServerFactory.CreateServer(webServerConfiguration, ActiveWebServerHost);
+
+                    // Stash host object on context for use in url generation
+                    contextWithServerSetting.ForEach(x =>
+                    {
+                        if (x.TestFileSettings.Server.Enabled.GetValueOrDefault())
+                        {
+                            x.WebServerHost = webServerHost;
+                        }
+                    });
+                }
             }
 
             return webServerHost;
@@ -399,6 +424,7 @@ namespace Chutzpah
                 {
                     ChutzpahTracer.TraceInformation("Start test run for {0} in {1} mode", testContext.FirstInputTestFile, testExecutionMode);
 
+                    testContext.TaskId = Task.CurrentId.GetValueOrDefault();
                     try
                     {
                         try
@@ -443,11 +469,15 @@ namespace Chutzpah
                                 testContext.TestHarnessPath,
                                 testContext.FirstInputTestFile);
 
+                            callback.TestContextStarted(testContext);
+
                             var testSummaries = InvokeTestRunner(
                                 options,
                                 testContext,
                                 testExecutionMode,
                                 callback);
+
+                            callback.TestContextFinished(testContext);
 
                             foreach (var testSummary in testSummaries)
                             {
@@ -494,7 +524,7 @@ namespace Chutzpah
                         };
 
                         overallSummary.Errors.Add(error);
-                        callback.FileError(error);
+                        callback.FileError(testContext, error);
 
                         ChutzpahTracer.TraceError(e, "Error during test execution of {0}", testContext.FirstInputTestFile);
                     }
@@ -583,7 +613,7 @@ namespace Chutzpah
                     };
 
                     overallSummary.Errors.Add(error);
-                    callback.FileError(error);
+                    callback.FileError(null, error);
 
                     ChutzpahTracer.TraceError(e, "Error during building test context for {0}", pathString);
                 }

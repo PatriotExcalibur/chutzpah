@@ -1,6 +1,8 @@
 ﻿var module = module || {};
 module.exports = module.exports || {};
 
+const timers = require("timers");
+
 module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, onFrameworkLoaded, isTestingDone) => {
 
     const chutzpahCommon = require('../chutzpahFunctions.js');
@@ -32,8 +34,8 @@ module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, o
         ignoreResourceLoadingError = "true" === process.argv[6].toLowerCase();
     }
 
-    if (process.argv.length > 7) {
-        userAgent = process.argv[7];
+    if (process.argv.length > 8) {
+        userAgent = process.argv[8];
     }
 
     function debugLog(msg) {
@@ -246,6 +248,10 @@ module.exports.runner = async (onInitialized, onPageLoaded, isFrameworkLoaded, o
                         return;
                     }
                     window = win;
+
+                    // JSDom doesn't define these but we can use the global ones Node gives us.
+                    window.setImmediate = timers.setImmediate;
+                    window.clearImmediate = timers.clearImmediate;
 
                     debugLog("Setup stubs for JsDom");
                     window.eval(`
