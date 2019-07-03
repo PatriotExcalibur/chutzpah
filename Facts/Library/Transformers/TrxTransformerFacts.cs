@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Chutzpah.Extensions;
+using Chutzpah.Models;
+using Chutzpah.Transformers;
+using Chutzpah.VSTS;
+using Chutzpah.Wrappers;
+using Moq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
-using Chutzpah.Extensions;
-using Chutzpah.Models;
-using Chutzpah.Transformers;
-using Chutzpah.VSTS;
 using Xunit;
-using Chutzpah.Wrappers;
-using Moq;
 
 namespace Chutzpah.Facts.Library.Transformers
 {
@@ -96,7 +96,7 @@ namespace Chutzpah.Facts.Library.Transformers
                 var vststUnitTest = testDefinitions[i];
                 var testSummary = summary.Tests[i];
 
-                Assert.Equal(vststUnitTest.TestMethod.name, testSummary.TestName);
+                Assert.Equal(vststUnitTest.TestMethod.name, $"{testSummary.ModuleName} - {testSummary.TestName}");
                 Assert.Equal(vststUnitTest.TestMethod.adapterTypeName, "Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter");
             }
 
@@ -109,8 +109,8 @@ namespace Chutzpah.Facts.Library.Transformers
                 var vststUnitTestResult = testResults[i];
                 var testSummary = summary.Tests[i];
 
-                Assert.Equal(vststUnitTestResult.testName,testSummary.TestName);
-                Assert.Equal(vststUnitTestResult.outcome,testSummary.ResultsAllPassed ? "Passed":"Failed");
+                Assert.Equal(vststUnitTestResult.testName, $"{testSummary.ModuleName} - {testSummary.TestName}");
+                Assert.Equal(vststUnitTestResult.outcome, testSummary.ResultsAllPassed ? "Passed" : "Failed");
                 if (vststUnitTestResult.Items != null && vststUnitTestResult.Items.Any())
                     Assert.Equal(((OutputType)vststUnitTestResult.Items[0]).ErrorInfo.Message, testSummary.TestResults[0].Message);
             }
@@ -119,8 +119,8 @@ namespace Chutzpah.Facts.Library.Transformers
                 trx.Items.GetInstance<TestRunTypeResultSummary>(VSTSExtensions.TestRunItemType.ResultSummary)
                     .Items.First();
 
-            Assert.Equal(counters.passed,2);
-            Assert.Equal(counters.failed,2);
+            Assert.Equal(counters.passed, 2);
+            Assert.Equal(counters.failed, 2);
         }
     }
 }

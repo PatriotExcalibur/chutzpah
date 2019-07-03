@@ -121,7 +121,7 @@ namespace Chutzpah.Transformers
                     (testCase) => new UnitTestType
                     {
                         id = testCase.Id.ToString(),
-                        name = testCase.TestName,
+                        name = $"{testCase.ModuleName} - {testCase.TestName}",
                         storage = testCase.InputTestFile,
                         Items = new[]
                         {
@@ -135,7 +135,7 @@ namespace Chutzpah.Transformers
                             adapterTypeName = "Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter",
                             className = Path.GetFileNameWithoutExtension(testCase.InputTestFile),
                             codeBase = testCase.InputTestFile,
-                            name = testCase.TestName
+                            name = $"{testCase.ModuleName} - {testCase.TestName}"
                         }
                     }).ToArray();
 
@@ -167,7 +167,7 @@ namespace Chutzpah.Transformers
                 {
                     executionId = testCase.ExecutionId.ToString(),
                     testId = testCase.Id.ToString(),
-                    testName = testCase.TestName,
+                    testName = $"{testCase.ModuleName} - {testCase.TestName}",
                     computerName = Environment.MachineName,
                     duration = TimeSpan.FromMilliseconds(testCase.TimeTaken).ToString("c"),
                     // I tried adding this to StandardConsoleRunner, but it demanded too many changes.
